@@ -8,19 +8,18 @@
 #include "compute.h"
 
 // represents the objects in the system.  Global variables
-vector3 *hVel, *d_hVel;
-vector3 *hPos, *d_hPos;
-double *mass;
+vector3 *hVel;
+vector3 *hPos;
+double* mass;
 
 //initHostMemory: Create storage for numObjects entities in our system
 //Parameters: numObjects: number of objects to allocate
 //Returns: None
 //Side Effects: Allocates memory in the hVel, hPos, and mass global variables
-void initHostMemory(int numObjects)
-{
-	hVel = (vector3 *)malloc(sizeof(vector3) * numObjects);
-	hPos = (vector3 *)malloc(sizeof(vector3) * numObjects);
-	mass = (double *)malloc(sizeof(double) * numObjects);
+void initHostMemory(int numEntities) {
+    hVel = (vector3*)malloc(numEntities * sizeof(vector3));
+    hPos = (vector3*)malloc(numEntities * sizeof(vector3));
+    mass = (double*)malloc(numEntities * sizeof(double));
 }
 
 //freeHostMemory: Free storage allocated by a previous call to initHostMemory
@@ -58,7 +57,7 @@ void planetFill(){
 //Side Effects: Fills count entries in our system starting at index start (0 based)
 void randomFill(int start, int count)
 {
-	int i, j, c = start;
+	int i, j = start;
 	for (i = start; i < start + count; i++)
 	{
 		for (j = 0; j < 3; j++)
@@ -92,24 +91,26 @@ void printSystem(FILE* handle){
 int main(int argc, char **argv)
 {
 	clock_t t0=clock();
-	int t_now;
+	//int t_now;
 	//srand(time(NULL));
 	srand(1234);
 	initHostMemory(NUMENTITIES);
 	planetFill();
 	randomFill(NUMPLANETS + 1, NUMASTEROIDS);
 	//now we have a system.
-	#ifdef DEBUG
-	printSystem(stdout);
-	#endif
-	for (t_now=0;t_now<DURATION;t_now+=INTERVAL){
-		compute();
-	}
-	clock_t t1=clock()-t0;
 #ifdef DEBUG
 	printSystem(stdout);
 #endif
-	printf("This took a total time of %f seconds\n",(double)t1/CLOCKS_PER_SEC);
+	for (int t = 0; t < DURATION; t += INTERVAL) {
+		compute();
+	}
+	clock_t t1=clock()-t0;
 
+#ifdef DEBUG
+	printf("END OF INITIAL DATA\n\n\n\n\n");
+	printSystem(stdout);
+#endif
+	printf("This took a total time of %f seconds\n",(double)t1/CLOCKS_PER_SEC);
 	freeHostMemory();
 }
+
