@@ -101,6 +101,7 @@ int main(int argc, char **argv)
 #ifdef DEBUG
 	printSystem(stdout);
 #endif
+    // call compute 
 	for (int t = 0; t < DURATION; t += INTERVAL) {
 		compute();
 	}
